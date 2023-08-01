@@ -1,29 +1,15 @@
 import express from "express";
-import { findOne, insertOne } from "./mongoDB";
+import { find, findOne, insertOne } from "./mongoDB";
+import cors from "cors";
 
 const app = express();
 app.listen(3000);
 
-app.get("/", (req, res) => {
-  res.send("Hiiiii regular");
-});
-
-app.get("/recipe", (req, res) => {
-  let message: string = "";
-  findOne({ name: "פשטידת פצפוצי אורז" })
-    .then((resultItem) => {
-      if (resultItem) {
-        message = `Hiiiii ${resultItem.name} recipe`;
-      } else {
-        message = `item didnt found`;
-      }
-      console.log(message);
-      res.send(message);
-    })
-    .catch((e) => {
-      res.send(`${e} error occured`);
-    });
-});
+app.use(
+  cors({
+    origin: "http://localhost:4200",
+  })
+);
 
 app.get("/recipes", (req, res) => {
   insertOne({
@@ -61,4 +47,32 @@ app.get("/recipes", (req, res) => {
     tags: ["פשטידה"],
   });
   res.send("Hiiiii recipes");
+});
+
+app.get("/", (req, res) => {
+  find()
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((e) => {
+      console.log(e);
+      res.send(e);
+    });
+});
+
+app.get("/recipe", (req, res) => {
+  let message: string = "";
+  findOne({ name: "פשטידת פצפוצי אורז" })
+    .then((resultItem) => {
+      if (resultItem) {
+        message = `Hiiiii ${resultItem.name} recipe`;
+      } else {
+        message = `item didnt found`;
+      }
+      console.log(message);
+      res.send(message);
+    })
+    .catch((e) => {
+      res.send(`${e} error occured`);
+    });
 });
